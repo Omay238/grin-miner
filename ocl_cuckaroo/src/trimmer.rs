@@ -58,8 +58,8 @@ macro_rules! get_device_info {
 		match $dev.info(DeviceInfo::$name) {
 			Ok(DeviceInfoResult::$name(value)) => value,
 			_ => panic!("Failed to retrieve device {}", stringify!($name)),
-			}
-		}};
+		}
+	}};
 }
 
 #[cfg(feature = "profile")]

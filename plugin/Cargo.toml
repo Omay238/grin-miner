@@ -1,11 +1,12 @@
 [package]
 name = "grin_miner_plugin"
-version = "4.0.0"
+version = "5.0.0"
 authors = ["Grin Developers <mimblewimble@lists.launchpad.net>"]
 repository = "https://github.com/mimblewimble/grin-miner"
 description = "Device specific plugins for the grin miner"
 license = "Apache-2.0"
 workspace = ".."
+edition = "2024"
 
 [dependencies]
 byteorder = "1"

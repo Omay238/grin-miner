@@ -1,17 +1,21 @@
 [package]
 name = "grin_miner_config"
-version = "4.0.0"
+version = "5.0.0"
 authors = ["Grin Developers <mimblewimble@lists.launchpad.net>"]
 description = "Configuration handling for the grin miner"
 license = "Apache-2.0"
 repository = "https://github.com/mimblewimble/grin-miner"
 workspace = ".."
+edition = "2024"
 
 [dependencies]
-cuckoo_miner = { path = "../cuckoo-miner", version = "4.0.0" }
-dirs = "2"
-grin_miner_util = { path = "../util", version = "4.0.0" }
+cuckoo_miner = { path = "../cuckoo-miner", version = "5.0.0" }
+dirs = "6"
+grin_miner_util = { path = "../util", version = "5.0.0" }
 serde = "1"
 serde_derive = "1"
-slog = { version = "2", features = ["max_level_trace", "release_max_level_trace"] }
-toml = "0.5"
+slog = { version = "2", features = [
+    "max_level_trace",
+    "release_max_level_trace",
+] }
+toml = "0.9"

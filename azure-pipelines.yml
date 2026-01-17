@@ -18,40 +18,40 @@ trigger:
       - master
       - milestone/*
   tags:
-    include: ['*']
+    include: ["*"]
 
 pr:
   branches:
-    include: ['*']
+    include: ["*"]
 
 variables:
-  RUST_BACKTRACE: '1'
-  RUSTFLAGS: '-C debug-assertions'
+  RUST_BACKTRACE: "1"
+  RUSTFLAGS: "-C debug-assertions"
 
 jobs:
-- job: linux
-  pool:
-    vmImage: ubuntu-latest
-  strategy:
-    matrix:
-      test:
-        CI_JOB: test
-      release:
-        CI_JOB: release
-        PLATFORM: linux-amd64
-  steps:
-    - template: '.ci/install.yml'
-    - script: cd cuckoo-miner && cargo test --release
-      displayName: Cargo Test
-    - template: '.ci/release.yml'
-- job: macos
-  pool:
-    vmImage: macos-latest
-  strategy:
-    matrix:
-      release:
-        CI_JOB: release
-        PLATFORM: macos
-  steps:
-    - template: '.ci/install.yml'
-    - template: '.ci/release.yml'
+  - job: linux
+    pool:
+      vmImage: ubuntu-latest
+    strategy:
+      matrix:
+        test:
+          CI_JOB: test
+        release:
+          CI_JOB: release
+          PLATFORM: linux-amd64
+    steps:
+      - template: ".ci/install.yml"
+      - script: cd cuckoo-miner && cargo test --release
+        displayName: Cargo Test
+      - template: ".ci/release.yml"
+  - job: macos
+    pool:
+      vmImage: macos-latest
+    strategy:
+      matrix:
+        release:
+          CI_JOB: release
+          PLATFORM: macos
+    steps:
+      - template: ".ci/install.yml"
+      - template: ".ci/release.yml"

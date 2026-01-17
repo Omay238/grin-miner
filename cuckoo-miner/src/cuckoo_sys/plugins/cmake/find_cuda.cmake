@@ -10,7 +10,7 @@ find_package(CUDA 4)
 
 if(CUDA_FOUND)
 	message(STATUS "Found CUDA Toolkit v${CUDA_VERSION_STRING}")
-	
+
 	# CUDA 9.1 + installs a symlink to its preferred compiler, so use that if it exists
 	# Otherwise, try to default to /usr/bin/gcc if one hasn't been supplied at the command line
 	# This will not override an existing cache
@@ -34,15 +34,15 @@ if(CUDA_FOUND)
 	endif()
 
 	# CUDA_ARCH_BIN is a space separated list of versions to include in output so-file. So you can set CUDA_ARCH_BIN = 10 11 12 13 20
-	# Also user can specify virtual arch in parenthesis to limit instructions  set, 
+	# Also user can specify virtual arch in parenthesis to limit instructions  set,
 	# for example CUDA_ARCH_BIN = 11(11) 12(11) 13(11) 20(11) 21(11) -> forces using only sm_11 instructions.
-	# The CMake scripts interpret XX as XX (XX). This allows user to omit parenthesis. 
-	# Arch 21 is an exceptional case since it doesn't have own sm_21 instructions set. 
+	# The CMake scripts interpret XX as XX (XX). This allows user to omit parenthesis.
+	# Arch 21 is an exceptional case since it doesn't have own sm_21 instructions set.
 	# So 21 = 21(21) is an invalid configuration and user has to explicitly force previous sm_20 instruction set via 21(20).
 	# CUDA_ARCH_BIN adds support of only listed GPUs. As alternative CMake scripts also parse 'CUDA_ARCH_PTX' variable,
-	# which is a list of intermediate PTX codes to include in final so-file. The PTX code can/will be JIT compiled for any current or future GPU. 
+	# which is a list of intermediate PTX codes to include in final so-file. The PTX code can/will be JIT compiled for any current or future GPU.
 	# To add support of older GPU for kinfu, I would embed PTX 11 and 12 into so-file. GPU with sm_13  will run PTX 12 code (no difference for kinfu)
-	
+
 	# Find a complete list for CUDA compute capabilities at http://developer.nvidia.com/cuda-gpus
 
         if(NOT ${CUDA_VERSION_STRING} VERSION_LESS "10.0")

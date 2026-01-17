@@ -235,8 +235,8 @@ __kernel  void LeanRound(const u64 v0i, const u64 v1i, const u64 v2i, const u64 
 		el[lid][5] = load.s5;
 		el[lid][6] = load.s6;
 		el[lid][7] = load.s7;
-		
-		// process as 8 x 32bit segment, GPUs have 32bit ALUs 
+
+		// process as 8 x 32bit segment, GPUs have 32bit ALUs
 		for (short i = 0; i < 8; i++)
 		{
 			// shortcut to current 32bit value
@@ -244,7 +244,7 @@ __kernel  void LeanRound(const u64 v0i, const u64 v1i, const u64 v2i, const u64 
 			// how many edges we process in the block
 			short lEdges = popcount(ee);
 			// whole warp will always execute worst case scenario, but it will help in the long run (not benched)
-			
+
 			// now a loop for every single living edge in current 32 edge block
 			for (short e = 0; e < lEdges; e++)
 			{
@@ -256,7 +256,7 @@ __kernel  void LeanRound(const u64 v0i, const u64 v1i, const u64 v2i, const u64 
 				int nonce = start + subPos;
 				// calculate siphash24 for either U or V (host device control)
 				u32 hash = dipnode(v0i, v1i, v2i, v3i, nonce, uorv);
-				
+
 				// this time we set edge bit counters - PASS 1
 				if (mode == MODE_SETCNT)
 				{

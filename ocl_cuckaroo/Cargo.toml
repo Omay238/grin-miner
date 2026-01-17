@@ -1,8 +1,8 @@
 [package]
 name = "ocl_cuckaroo"
-version = "1.0.2"
+version = "2.0.0"
 workspace = ".."
-edition = "2018"
+edition = "2024"
 
 [features]
 profile = []
@@ -11,9 +11,9 @@ profile = []
 [dependencies]
 blake2-rfc = "0.2"
 byteorder = "1"
-grin_miner_plugin = { path = "../plugin", version = "4.0.0" }
+grin_miner_plugin = { path = "../plugin", version = "5.0.0" }
 libc = "0.2"
-hashbrown = "0.7"
+hashbrown = "0.16"
 ocl = "0.19"
 
 [lib]
