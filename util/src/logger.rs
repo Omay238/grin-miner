@@ -22,7 +22,7 @@ use std::sync::Mutex;
 use backtrace::Backtrace;
 use std::{panic, thread};
 
-use types::{LogLevel, LoggingConfig};
+use crate::types::{LogLevel, LoggingConfig};
 
 fn convert_log_level(in_level: &LogLevel) -> Level {
 	match *in_level {

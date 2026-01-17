@@ -33,7 +33,7 @@ slog = { version = "2", features = [
     "max_level_trace",
     "release_max_level_trace",
 ] }
-rand = "0.9"
+rand = { version = "0.9", features = ["os_rng"] }
 regex = "1.12"
 rust-crypto = "0.2"
 time = "0.3"

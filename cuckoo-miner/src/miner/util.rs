@@ -15,7 +15,7 @@
 //! header manipulation utility functions
 
 use byteorder::{BigEndian, ByteOrder};
-use rand::{self, Rng};
+use rand::{self, TryRngCore};
 
 pub fn header_data(pre_nonce: &str, post_nonce: &str, nonce: u64) -> (Vec<u8>, u32) {
 	// Turn input strings into vectors
@@ -37,7 +37,7 @@ pub fn header_data(pre_nonce: &str, post_nonce: &str, nonce: u64) -> (Vec<u8>, u
 }
 
 pub fn get_next_header_data(pre_nonce: &str, post_nonce: &str) -> (u64, Vec<u8>, u32) {
-	let nonce: u64 = rand::OsRng::new().unwrap().gen();
+	let nonce: u64 = rand::rngs::OsRng.try_next_u64().unwrap();
 	let (hd, sec_scaling) = header_data(pre_nonce, post_nonce, nonce);
 	(nonce, hd, sec_scaling)
 }

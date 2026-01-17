@@ -15,9 +15,9 @@
 //! Miner types
 use std::sync::{Arc, RwLock};
 
-use error::CuckooMinerError;
+use crate::error::CuckooMinerError;
+use crate::{PluginConfig, PluginLibrary};
 use plugin::{SolverSolutions, SolverStats};
-use {PluginConfig, PluginLibrary};
 
 pub type JobSharedDataType = Arc<RwLock<JobSharedData>>;
 

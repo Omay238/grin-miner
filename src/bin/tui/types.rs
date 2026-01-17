@@ -16,15 +16,17 @@
 
 use std::sync::{Arc, RwLock};
 
-use cursive::view::View;
+use crate::stats::Stats;
 use cursive::Cursive;
-use stats::Stats;
+use cursive::view::View;
 
 /// Main message struct to communicate between the UI and
 /// the main process
 pub enum UIMessage {
 	/// Update mining status
 	UpdateStatus(Arc<RwLock<Stats>>),
+	/// Request the UI to quit (used when running Cursive in its own thread)
+	Quit,
 }
 
 /// Trait for a UI element that recieves status update messages

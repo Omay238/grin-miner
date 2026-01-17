@@ -15,17 +15,17 @@
 //! Client network controller, controls requests and responses from the
 //! stratum server
 
+use crate::stats;
+use crate::types;
 use bufstream::BufStream;
 use native_tls::{TlsConnector, TlsStream};
 use serde_json;
-use stats;
 use std;
 use std::io::{self, BufRead, ErrorKind, Read, Write};
 use std::net::TcpStream;
-use std::sync::{mpsc, Arc, RwLock};
+use std::sync::{Arc, RwLock, mpsc};
 use std::thread;
 use time;
-use types;
 use util::LOGGER;
 
 #[derive(Debug)]
@@ -524,9 +524,10 @@ impl Controller {
 				was_disconnected = true;
 				if time::get_time().sec > next_server_retry {
 					if self.try_connect().is_err() {
-						let status = format!("Connection Status: Can't establish server connection to {}. Will retry every {} seconds",
-							self.server_url,
-							server_retry_interval);
+						let status = format!(
+							"Connection Status: Can't establish server connection to {}. Will retry every {} seconds",
+							self.server_url, server_retry_interval
+						);
 						warn!(LOGGER, "{}", status);
 						let mut stats = self.stats.write().unwrap();
 						stats.client_stats.connection_status = status;

@@ -58,17 +58,17 @@ extern crate cursive;
 use std::cmp::{self, Ordering};
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::rc::Rc;
+use std::sync::Arc;
 
 // External Dependencies ------------------------------------------------------
+use cursive::With;
 use cursive::align::HAlign;
 use cursive::direction::Direction;
 use cursive::event::{Callback, Event, EventResult, Key};
 use cursive::theme::ColorStyle;
 use cursive::theme::PaletteColor::*;
 use cursive::vec::Vec2;
-use cursive::view::{ScrollBase, View};
-use cursive::With;
+use cursive::view::{CannotFocus, ScrollBase, View};
 use cursive::{Cursive, Printer};
 
 /// A trait for displaying and sorting items inside a
@@ -157,14 +157,18 @@ pub struct TableView<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static>
 	items: Vec<T>,
 	rows_to_items: Vec<usize>,
 
-	on_sort: Option<Rc<dyn Fn(&mut Cursive, H, Ordering)>>,
+	on_sort: Option<Arc<dyn Fn(&mut Cursive, H, Ordering) + Send + Sync>>,
 	// TODO Pass drawing offsets into the handlers so a popup menu
 	// can be created easily?
-	on_submit: Option<Rc<dyn Fn(&mut Cursive, usize, usize)>>,
-	on_select: Option<Rc<dyn Fn(&mut Cursive, usize, usize)>>,
+	on_submit: Option<Arc<dyn Fn(&mut Cursive, usize, usize) + Send + Sync>>,
+	on_select: Option<Arc<dyn Fn(&mut Cursive, usize, usize) + Send + Sync>>,
 }
 
-impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H> {
+impl<
+	T: TableViewItem<H> + Send + Sync + 'static,
+	H: Eq + Hash + Copy + Clone + Send + Sync + 'static,
+> TableView<T, H>
+{
 	/// Creates a new empty `TableView` without any columns.
 	///
 	/// A TableView should be accompanied by a enum of type `H` representing
@@ -300,9 +304,9 @@ impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H>
 	/// ```
 	pub fn set_on_sort<F>(&mut self, cb: F)
 	where
-		F: Fn(&mut Cursive, H, Ordering) + 'static,
+		F: Fn(&mut Cursive, H, Ordering) + Send + Sync + 'static,
 	{
-		self.on_sort = Some(Rc::new(move |s, h, o| cb(s, h, o)));
+		self.on_sort = Some(Arc::new(move |s, h, o| cb(s, h, o)));
 	}
 
 	/// Sets a callback to be used when a selected column is sorted by
@@ -319,7 +323,7 @@ impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H>
 	/// ```
 	pub fn on_sort<F>(self, cb: F) -> Self
 	where
-		F: Fn(&mut Cursive, H, Ordering) + 'static,
+		F: Fn(&mut Cursive, H, Ordering) + Send + Sync + 'static,
 	{
 		self.with(|t| t.set_on_sort(cb))
 	}
@@ -339,9 +343,9 @@ impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H>
 	/// ```
 	pub fn set_on_submit<F>(&mut self, cb: F)
 	where
-		F: Fn(&mut Cursive, usize, usize) + 'static,
+		F: Fn(&mut Cursive, usize, usize) + Send + Sync + 'static,
 	{
-		self.on_submit = Some(Rc::new(move |s, row, index| cb(s, row, index)));
+		self.on_submit = Some(Arc::new(move |s, row, index| cb(s, row, index)));
 	}
 
 	/// Sets a callback to be used when `<Enter>` is pressed while an item
@@ -361,7 +365,7 @@ impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H>
 	/// ```
 	pub fn on_submit<F>(self, cb: F) -> Self
 	where
-		F: Fn(&mut Cursive, usize, usize) + 'static,
+		F: Fn(&mut Cursive, usize, usize) + Send + Sync + 'static,
 	{
 		self.with(|t| t.set_on_submit(cb))
 	}
@@ -380,9 +384,9 @@ impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H>
 	/// ```
 	pub fn set_on_select<F>(&mut self, cb: F)
 	where
-		F: Fn(&mut Cursive, usize, usize) + 'static,
+		F: Fn(&mut Cursive, usize, usize) + Send + Sync + 'static,
 	{
-		self.on_select = Some(Rc::new(move |s, row, index| cb(s, row, index)));
+		self.on_select = Some(Arc::new(move |s, row, index| cb(s, row, index)));
 	}
 
 	/// Sets a callback to be used when an item is selected.
@@ -401,7 +405,7 @@ impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H>
 	/// ```
 	pub fn on_select<F>(self, cb: F) -> Self
 	where
-		F: Fn(&mut Cursive, usize, usize) + 'static,
+		F: Fn(&mut Cursive, usize, usize) + Send + Sync + 'static,
 	{
 		self.with(|t| t.set_on_select(cb))
 	}
@@ -591,7 +595,11 @@ impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H>
 	}
 }
 
-impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H> {
+impl<
+	T: TableViewItem<H> + Send + Sync + 'static,
+	H: Eq + Hash + Copy + Clone + Send + Sync + 'static,
+> TableView<T, H>
+{
 	fn draw_columns<C: Fn(&Printer, &TableColumn<H>)>(
 		&self,
 		printer: &Printer,
@@ -700,8 +708,10 @@ impl<T: TableViewItem<H>, H: Eq + Hash + Copy + Clone + 'static> TableView<T, H>
 	}
 }
 
-impl<T: TableViewItem<H> + 'static, H: Eq + Hash + Copy + Clone + 'static> View
-	for TableView<T, H>
+impl<
+	T: TableViewItem<H> + Send + Sync + 'static,
+	H: Eq + Hash + Copy + Clone + Send + Sync + 'static,
+> View for TableView<T, H>
 {
 	fn draw(&self, printer: &Printer) {
 		self.draw_columns(printer, "╷ ", |printer, column| {
@@ -792,8 +802,12 @@ impl<T: TableViewItem<H> + 'static, H: Eq + Hash + Copy + Clone + 'static> View
 		self.last_size = size;
 	}
 
-	fn take_focus(&mut self, _: Direction) -> bool {
-		self.enabled && !self.items.is_empty()
+	fn take_focus(&mut self, _: Direction) -> Result<EventResult, CannotFocus> {
+		if self.enabled && !self.items.is_empty() {
+			Ok(EventResult::Consumed(None))
+		} else {
+			Err(CannotFocus)
+		}
 	}
 
 	fn on_event(&mut self, event: Event) -> EventResult {

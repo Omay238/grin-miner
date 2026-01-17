@@ -28,7 +28,7 @@ struct Solver {
 	mutate_nonce: bool,
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn create_solver_ctx(params: *mut SolverParams) -> *mut SolverCtx {
 	let platform = match (*params).platform {
 		1 => Some("AMD"),
@@ -51,24 +51,24 @@ pub unsafe extern "C" fn create_solver_ctx(params: *mut SolverParams) -> *mut So
 	mem::transmute::<&mut Solver, *mut SolverCtx>(solver_ref)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn destroy_solver_ctx(solver_ctx_ptr: *mut SolverCtx) {
 	// create box to clear memory
 	let solver_ptr = mem::transmute::<*mut SolverCtx, *mut Solver>(solver_ctx_ptr);
 	let _solver_box = Box::from_raw(solver_ptr);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn stop_solver(_solver_ctx_ptr: *mut SolverCtx) {}
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn fill_default_params(params: *mut SolverParams) {
 	(*params).device = 0;
 	(*params).platform = 0;
 	(*params).edge_bits = 31;
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn run_solver(
 	ctx: *mut SolverCtx,
 	header_ptr: *const c_uchar,
@@ -111,6 +111,7 @@ pub unsafe extern "C" fn run_solver(
 	(*stats).device_id = solver.trimmer.device_id as u32;
 	let name_bytes = solver.trimmer.device_name.as_bytes();
 	let n = std::cmp::min((*stats).device_name.len(), name_bytes.len());
+	#[allow(dangerous_implicit_autorefs)]
 	(*stats).device_name[..n].copy_from_slice(&solver.trimmer.device_name.as_bytes()[..n]);
 	(*stats).last_solution_time = duration_to_u64(elapsed);
 	(*stats).last_start_time =

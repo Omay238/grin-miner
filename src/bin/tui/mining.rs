@@ -17,18 +17,18 @@
 use std::cmp::Ordering;
 use std::sync::{Arc, RwLock};
 
+use cursive::Cursive;
 use cursive::direction::Orientation;
 use cursive::traits::*;
 use cursive::view::View;
 use cursive::views::{Dialog, LinearLayout, ResizedView, StackView, TextView};
-use cursive::Cursive;
 
-use tui::constants::*;
-use tui::types::*;
+use crate::tui::constants::*;
+use crate::tui::types::*;
 
+use crate::stats;
+use crate::tui::table::{TableView, TableViewItem};
 use plugin::SolverStats;
-use stats;
-use tui::table::{TableView, TableViewItem};
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 enum MiningDeviceColumn {

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::{config, stats, types};
 /// Plugin controller, listens for messages sent from the stratum
 /// server, controls plugins and responds appropriately
-use std::sync::{mpsc, Arc, RwLock};
+use std::sync::{Arc, RwLock, mpsc};
 use std::{self, thread};
 use time;
 use util::LOGGER;
-use {config, stats, types};
 
 use cuckoo::{CuckooMiner, CuckooMinerError};
 
@@ -138,9 +138,9 @@ impl Controller {
 			if !s.has_errored {
 				debug!(
 					LOGGER,
-							"Mining: Plugin {} - Device {} ({}) at Cucka{}{} - Status: {} : Last Graph time: {}s; \
+					"Mining: Plugin {} - Device {} ({}) at Cucka{}{} - Status: {} : Last Graph time: {}s; \
 					 Graphs per second: {:.*} - Total Attempts: {}",
-							i,
+					i,
 					s.device_id,
 					s.get_device_name(),
 					if s.edge_bits < 30 { "rooz" } else { "too" },

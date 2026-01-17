@@ -24,7 +24,7 @@ use util::LOGGER;
 
 use libloading;
 
-use error::CuckooMinerError;
+use crate::error::CuckooMinerError;
 
 /// Struct to hold instances of loaded plugins
 
@@ -46,7 +46,7 @@ impl PluginLibrary {
 	pub fn new(lib_full_path: &str) -> Result<PluginLibrary, CuckooMinerError> {
 		debug!(LOGGER, "Loading miner plugin: {}", &lib_full_path);
 
-		let result = libloading::Library::new(lib_full_path);
+		let result = unsafe { libloading::Library::new(lib_full_path) };
 
 		if let Err(e) = result {
 			return Err(CuckooMinerError::PluginNotFoundError(format!(

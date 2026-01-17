@@ -44,7 +44,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, RwLock};
 use std::thread;
 
-use util::{init_logger, LOGGER};
+use util::{LOGGER, init_logger};
 
 // include build information
 pub mod built_info {
@@ -66,7 +66,7 @@ pub fn info_strings() -> (String, String, String) {
 			built_info::FEATURES_STR,
 			built_info::BUILT_TIME_UTC
 		),
-		format!("Dependencies:\n {}", built_info::DEPENDENCIES_STR),
+		String::new(), // format!("Dependencies:\n {}", built_info::DEPENDENCIES_STR),
 	)
 }
 
@@ -79,12 +79,12 @@ fn log_build_info() {
 
 #[cfg(feature = "tui")]
 mod with_tui {
-	use stats;
+	use crate::stats;
+	use crate::tui::ui;
+	use crate::types;
 	use std::sync::atomic::{AtomicBool, Ordering};
-	use std::sync::{mpsc, Arc, RwLock};
+	use std::sync::{Arc, RwLock, mpsc};
 	use std::thread;
-	use tui::ui;
-	use types;
 
 	pub fn start_tui(
 		s: Arc<RwLock<stats::Stats>>,

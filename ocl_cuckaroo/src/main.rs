@@ -4,7 +4,7 @@ use ocl_cuckaroo::{Graph, Trimmer};
 use std::time::SystemTime;
 
 fn main() -> Result<(), String> {
-	let trimmer = Trimmer::build(None, None).expect("can't build trimmer");
+	let trimmer = unsafe { Trimmer::build(None, None).expect("can't build trimmer") };
 	let k = [
 		0xf4956dc403730b01,
 		0xe6d45de39c2a5a3e,

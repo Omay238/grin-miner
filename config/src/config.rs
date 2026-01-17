@@ -19,11 +19,11 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 
+use crate::types::MinerConfig;
+use crate::types::{ConfigError, ConfigMembers, GlobalConfig, GrinMinerPluginConfig};
 use cuckoo::{CuckooMinerError, PluginConfig};
 use toml;
-use types::MinerConfig;
-use types::{ConfigError, ConfigMembers, GlobalConfig, GrinMinerPluginConfig};
-use util::{LoggingConfig, LOGGER};
+use util::{LOGGER, LoggingConfig};
 
 extern crate dirs;
 

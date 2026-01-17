@@ -16,18 +16,18 @@
 //! to load a mining plugin, send it a Cuckoo Cycle POW problem, and
 //! return any resulting solutions.
 
+use crate::util::LOGGER;
 use std::ptr::NonNull;
-use std::sync::{mpsc, Arc, RwLock};
+use std::sync::{Arc, Mutex, RwLock, mpsc};
 use std::{thread, time};
-use util::LOGGER;
 
-use config::types::PluginConfig;
-use miner::types::{JobSharedData, JobSharedDataType, SolverInstance};
+use crate::config::types::PluginConfig;
+use crate::miner::types::{JobSharedData, JobSharedDataType, SolverInstance};
 
-use miner::consensus::Proof;
-use miner::util;
+use crate::miner::consensus::Proof;
+use crate::miner::util;
+use crate::{CuckooMinerError, PluginLibrary};
 use plugin::{Solution, SolverCtxWrapper, SolverSolutions, SolverStats};
-use {CuckooMinerError, PluginLibrary};
 
 /// Miner control Messages
 #[derive(Debug)]
@@ -92,25 +92,27 @@ impl CuckooMiner {
 		}
 		// "Detach" a stop function from the solver, to let us keep a control thread going
 		let ctx = solver.lib.create_solver_ctx(&mut solver.config.params);
-		let control_ctx = SolverCtxWrapper(NonNull::new(ctx).unwrap());
+		let control_ctx = Arc::new(Mutex::new(SolverCtxWrapper(NonNull::new(ctx).unwrap())));
 
 		let stop_fn = solver.lib.get_stop_solver_instance();
 
 		// monitor whether to send a stop signal to the solver, which should
 		// end the current solve attempt below
-		let stop_handle = thread::spawn(move || loop {
-			let ctx_ptr = control_ctx.0.as_ptr();
-			while let Some(message) = control_rx.iter().next() {
-				match message {
-					ControlMessage::Stop => {
-						PluginLibrary::stop_solver_from_instance(stop_fn.clone(), ctx_ptr);
-						return;
-					}
-					ControlMessage::Pause => {
-						PluginLibrary::stop_solver_from_instance(stop_fn.clone(), ctx_ptr);
-					}
-					_ => {}
-				};
+		let stop_handle = thread::spawn(move || {
+			loop {
+				let ctx_ptr = control_ctx.lock().unwrap().0.as_ptr();
+				while let Some(message) = control_rx.iter().next() {
+					match message {
+						ControlMessage::Stop => {
+							PluginLibrary::stop_solver_from_instance(stop_fn.clone(), ctx_ptr);
+							return;
+						}
+						ControlMessage::Pause => {
+							PluginLibrary::stop_solver_from_instance(stop_fn.clone(), ctx_ptr);
+						}
+						_ => {}
+					};
+				}
 			}
 		});
 
@@ -176,7 +178,7 @@ impl CuckooMiner {
 						})
 						.cloned()
 						.collect();
-					for mut ss in filtered_sols.iter_mut() {
+					for ss in filtered_sols.iter_mut() {
 						ss.nonce = nonce;
 						ss.id = job_id as u64;
 					}

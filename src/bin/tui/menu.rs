@@ -14,17 +14,17 @@
 
 //! Main Menu definition
 
+use cursive::Cursive;
 use cursive::align::HAlign;
 use cursive::direction::Orientation;
 use cursive::event::Key;
-use cursive::view::Identifiable;
+use cursive::view::Nameable;
 use cursive::view::View;
 use cursive::views::{
 	LinearLayout, OnEventView, ResizedView, SelectView, StackView, TextView, ViewRef,
 };
-use cursive::Cursive;
 
-use tui::constants::*;
+use crate::tui::constants::*;
 
 /// Create menu
 pub fn create() -> Box<dyn View> {

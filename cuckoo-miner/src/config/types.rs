@@ -14,10 +14,10 @@
 
 //! Public Types used for cuckoo-miner module
 
+use crate::{CuckooMinerError, PluginLibrary};
 use plugin::SolverParams;
 use std::path::PathBuf;
 use std::{fmt, io};
-use {CuckooMinerError, PluginLibrary};
 
 pub static SO_SUFFIX: &str = ".cuckooplugin";
 
