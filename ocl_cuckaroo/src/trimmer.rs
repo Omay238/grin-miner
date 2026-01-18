@@ -609,8 +609,7 @@ __kernel  void FluffySeed2A(const u64 v0i, const u64 v1i, const u64 v2i, const u
 		}
 		u64 last = sipblock[EDGE_BLOCK_MASK];
 
-		for (short s = 0; s < EDGE_BLOCK_SIZE; s++)ew(&mut $event_list).enq()?;
-				$names.push($msg);
+		for (short s = 0; s < EDGE_BLOCK_SIZE; s++)
 		{
 			u64 lookup = s == EDGE_BLOCK_MASK ? last : sipblock[s] ^ last;
 			uint2 hash = (uint2)(lookup & EDGEMASK, (lookup >> 32) & EDGEMASK);
@@ -638,7 +637,7 @@ __kernel  void FluffySeed2A(const u64 v0i, const u64 v1i, const u64 v2i, const u
 				);
 				buffer[idx + 1] = (ulong4)(
 					atom_xchg(&tmp[bucket][12 - counterLocal], (u64)0),
-				#[no_mangle]	atom_xchg(&tmp[bucket][13 - counterLocal], (u64)0),
+					atom_xchg(&tmp[bucket][13 - counterLocal], (u64)0),
 					atom_xchg(&tmp[bucket][14 - counterLocal], (u64)0),
 					atom_xchg(&tmp[bucket][15 - counterLocal], (u64)0)
 				);
